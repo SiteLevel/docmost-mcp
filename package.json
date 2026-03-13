@@ -10,7 +10,8 @@
     "build": "tsc",
     "start": "node build/index.js",
     "watch": "tsc --watch",
-    "inspector": "npx @modelcontextprotocol/inspector --config mcp_config.json"
+    "inspector": "npx @modelcontextprotocol/inspector --config mcp_config.json",
+    "test": "bun test"
   },
   "keywords": [
     "mcp",
@@ -25,14 +26,15 @@
   "dependencies": {
     "@hocuspocus/provider": "^3.4.4",
     "@hocuspocus/transformer": "^3.4.4",
-    "@modelcontextprotocol/sdk": "^1.25.3",
+    "@modelcontextprotocol/sdk": "^1.27.1",
     "@tiptap/core": "^3.18.0",
     "@tiptap/extension-image": "^3.18.0",
     "@tiptap/extension-link": "^3.18.0",
     "@tiptap/html": "^3.18.0",
     "@tiptap/starter-kit": "^3.18.0",
     "@types/jsdom": "^27.0.0",
-    "axios": "^1.6.0",
+    "axios": "^1.13.6",
+    "dotenv": "^17.3.1",
     "form-data": "^4.0.0",
     "jsdom": "^27.4.0",
     "marked": "^17.0.1",

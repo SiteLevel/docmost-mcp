@@ -1,3 +1,4 @@
+import "dotenv/config";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import FormData from "form-data";
@@ -15,7 +16,7 @@ import { readFileSync } from "fs";
 import { fileURLToPath } from "url";
 import { dirname, join } from "path";
 import { updatePageContentRealtime } from "./lib/collaboration.js";
-import { getCollabToken, performLogin } from "./lib/auth-utils.js";
+import { performLogin } from "./lib/auth-utils.js";
 
 // Read version from package.json
 const __filename = fileURLToPath(import.meta.url);
@@ -249,22 +250,17 @@ class DocmostClient {
       await this.client.post("/pages/update", { pageId, title });
     }
 
-    // 2. Update Content via WebSocket
-    let collabToken = "";
+    // 2. Update Content via WebSocket (login JWT works as collab token)
     try {
       const baseURL = this.client.defaults.baseURL || "";
-      collabToken = await getCollabToken(baseURL, this.token!);
-      await updatePageContentRealtime(pageId, content, collabToken, baseURL);
+      await updatePageContentRealtime(pageId, content, this.token!, baseURL);
     } catch (error: any) {
       console.error(
         "Failed to update page content via realtime collaboration:",
         error,
       );
-      const tokenPreview = collabToken
-        ? collabToken.substring(0, 15) + "..."
-        : "null";
       throw new Error(
-        `Failed to update page content: ${error.message} (Token: ${tokenPreview})`,
+        `Failed to update page content: ${error.message}`,
       );
     }
 
