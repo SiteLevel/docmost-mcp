@@ -31,8 +31,8 @@ A Model Context Protocol (MCP) server for [Docmost](https://docmost.com/), enabl
 ## Installation
 
 ```bash
-npm install
-npm run build
+bun install
+bun run build
 ```
 
 ## Configuration
@@ -67,10 +67,10 @@ Add the following to your MCP configuration (e.g. `claude_desktop_config.json`):
 
 ```bash
 # Watch mode
-npm run watch
+bun run watch
 
 # Build
-npm run build
+bun run build
 ```
 
 ## License
