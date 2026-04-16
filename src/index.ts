@@ -84,29 +84,28 @@ class DocmostClient {
   ): Promise<T[]> {
     await this.ensureAuthenticated();
 
-    // Clamp limit between 1 and 100
     const clampedLimit = Math.max(1, Math.min(100, limit));
 
-    let page = 1;
     let allItems: T[] = [];
+    let cursor: string | null = null;
     let hasNextPage = true;
 
     while (hasNextPage) {
-      const response = await this.client.post(endpoint, {
+      const payload: Record<string, any> = {
         ...basePayload,
         limit: clampedLimit,
-        page,
-      });
+        ...(cursor && { cursor }),
+      };
 
+      const response = await this.client.post(endpoint, payload);
       const data = response.data;
 
-      // Handle both direct data.items and data.data.items structures
       const items = data.data?.items || data.items || [];
       const meta = data.data?.meta || data.meta;
 
       allItems = allItems.concat(items);
       hasNextPage = meta?.hasNextPage || false;
-      page++;
+      cursor = meta?.nextCursor || null;
     }
 
     return allItems;
@@ -277,8 +276,7 @@ class DocmostClient {
       spaceId,
     });
 
-    // Filter search results (data is directly an array)
-    const items = response.data?.data || [];
+    const items = response.data?.data?.items || [];
     const filteredItems = items.map((item: any) => filterSearchResult(item));
 
     return {
