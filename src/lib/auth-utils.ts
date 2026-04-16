@@ -11,9 +11,18 @@ export async function performLogin(
       password,
     });
 
-    const accessToken = response.data?.data?.tokens?.accessToken;
+    // Token is now in Set-Cookie header as authToken=...
+    const cookies: string[] = response.headers["set-cookie"] ?? [];
+    let accessToken: string | undefined;
+    for (const cookie of cookies) {
+      const match = cookie.match(/^authToken=([^;]+)/);
+      if (match) {
+        accessToken = match[1];
+        break;
+      }
+    }
     if (!accessToken) {
-      throw new Error("No accessToken found in login response");
+      throw new Error("No authToken found in login response cookies");
     }
     return accessToken;
   } catch (error: any) {

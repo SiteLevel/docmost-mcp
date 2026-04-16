@@ -259,9 +259,7 @@ class DocmostClient {
         "Failed to update page content via realtime collaboration:",
         error,
       );
-      throw new Error(
-        `Failed to update page content: ${error.message}`,
-      );
+      throw new Error(`Failed to update page content: ${error.message}`);
     }
 
     return {

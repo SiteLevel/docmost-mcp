@@ -17,34 +17,42 @@ beforeEach(() => {
 });
 
 describe("performLogin", () => {
-  test("returns accessToken from JSON response body", async () => {
+  test("returns authToken from Set-Cookie header", async () => {
     mockedPost.mockResolvedValueOnce({
-      data: {
-        data: {
-          tokens: { accessToken: "test-token-123" },
-        },
+      data: { success: true, status: 200 },
+      headers: {
+        "set-cookie": [
+          "mfaToken=; Max-Age=0; Path=/; Expires=Thu, 01 Jan 1970 00:00:00 GMT; SameSite=Lax",
+          "authToken=test-token-123; Path=/; HttpOnly; Secure; SameSite=Lax",
+        ],
       },
     });
 
     const token = await performLogin("http://localhost:3000", "a@b.com", "pw");
     expect(token).toBe("test-token-123");
-    expect(mockedPost).toHaveBeenCalledWith("http://localhost:3000/auth/login", {
-      email: "a@b.com",
-      password: "pw",
-    });
+    expect(mockedPost).toHaveBeenCalledWith(
+      "http://localhost:3000/auth/login",
+      {
+        email: "a@b.com",
+        password: "pw",
+      },
+    );
   });
 
   test("does not export getCollabToken", () => {
     expect("getCollabToken" in authUtils).toBe(false);
   });
 
-  test("throws when response has no tokens", async () => {
+  test("throws when response has no authToken cookie", async () => {
     mockedPost.mockResolvedValueOnce({
-      data: { data: {} },
+      data: { success: true, status: 200 },
+      headers: {
+        "set-cookie": ["mfaToken=; Max-Age=0; Path=/; SameSite=Lax"],
+      },
     });
 
     expect(
       performLogin("http://localhost:3000", "a@b.com", "pw"),
-    ).rejects.toThrow("No accessToken found in login response");
+    ).rejects.toThrow("No authToken found in login response cookies");
   });
 });
